@@ -1,8 +1,10 @@
 package com.hfad.joke;
 
 import android.app.IntentService;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
-import android.util.Log;
+import android.support.v4.app.NotificationCompat;
 
 
 /**
@@ -14,6 +16,7 @@ import android.util.Log;
 public class DelayedMessageService extends IntentService {
 
     public static final String EXTRA_MESSAGE = "message";
+    public static final int NOTIFICATION_ID = 5453;
 
     public DelayedMessageService() {
         super("DelayedMessageService");
@@ -33,6 +36,22 @@ public class DelayedMessageService extends IntentService {
     }
 
     private void showText(String text) {
-        Log.wtf("DelayedMessageService", "The message is: " + text);
+        // create a notification builder
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                .setSmallIcon(android.R.drawable.sym_def_app_icon)
+                .setContentTitle(getString(R.string.question))
+                .setContentText(text)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setVibrate(new long[] {0, 1000})
+                .setAutoCancel(true);
+
+        // create an action
+        Intent actionIntent = new Intent(this, MainActivity.class);
+        PendingIntent actionPendingIntent = PendingIntent.getActivity(this, 0, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(actionPendingIntent);
+
+        // issue the notification
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.notify(NOTIFICATION_ID, builder.build());
     }
 }
